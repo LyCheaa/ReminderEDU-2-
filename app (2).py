@@ -1,9 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, Response
 from core_logic import ScheduleManager, ManualInputSource, CsvStorage
+from theme import CSSTheme
 
 app = Flask(__name__)
 storage = CsvStorage('schedule.csv')
 manager = ScheduleManager(storage)
+
 @app.route('/')
 def index():
     assignments = manager.process_and_sort()
@@ -30,6 +32,11 @@ def discard_schedule(assignment_id):
 
     return redirect(url_for('index'))
 
+@app.route('/style.css')
+def generate_css():
+    """Generate CSS dynamically from Python theme"""
+    css = CSSTheme.generate_css()
+    return Response(css, mimetype='text/css')
 
 if __name__ == '__main__':
     import os
